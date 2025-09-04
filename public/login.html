@@ -40,8 +40,34 @@
         </div>
     </nav>
 
+    <div class="container-fluid">
+        <div class="row">
+            <div class="d-none d-md-block col-12 col-md-6">
+                <img src="images.jfif" alt="login_image" class="img-fluid w-100">
+            </div>
+            <div class="col-12 col-md-6 d-flex align-items-center justify-content-center">
+                <form class="w-75" onsubmit="return false;">
+                    <h3 class="mb-4 text-center">Login</h3>
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" placeholder="Enter your username">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Enter your password">
+                    </div>
+                    <button onclick="login()" class=" btn btn-primary w-100">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
     <script>
-
+        function setCookie(cname, cvalue, exdays) {
+            const d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            let expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
         function getCookie(cname) {
             let name = cname + "=";
             let decodedCookie = decodeURIComponent(document.cookie);
@@ -67,6 +93,35 @@
             document.getElementById('register').classList.remove('d-none');
             document.getElementById('dashboard').classList.add('d-none');
             document.getElementById('logout').classList.add('d-none');
+        }
+        function login() {
+            let username = document.getElementById('username').value
+            let password = document.getElementById('password').value
+
+            let data = {
+                username, password
+            }
+            // console.log(data)
+            fetch('/api/login', {
+                method: 'post',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: data
+            }).then(response => {
+                if (response.ok) {
+                    const result = response.json();
+                    if (result.token) {
+                        setCookie('token', result.token, 1);
+                        window.location.href = "/dashboard.html";
+                    }
+                } else {
+                    console.error("Login failed:", response.status);
+                    alert("Login failed!");
+                }
+            }).catch(error => {
+                // Handle any errors during the fetch operation
+            });
         }
     </script>
 
